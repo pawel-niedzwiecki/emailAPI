@@ -1,26 +1,44 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+const createError = require("http-errors");
+const express = require("express");
+const bodyParser = require("body-parser");
+const path = require("path");
+const mongoose = require("mongoose");
+const configDB = require("./config/db.config");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
+const indexRouter = require("./routes/index.routes.js");
+const usersRouter = require("./routes/users.routes.js");
+const emailRouter = require("./routes/email.routes.js");
 
-var app = express();
+const app = express();
+
+//Set up default mongoose connection
+const mongoDB = `mongodb+srv://${configDB.username}:${configDB.password}@${configDB.host}/${configDB.db}?retryWrites=true&w=majority`;
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
+
+//Get the default connection
+const db = mongoose.connection;
+
+//Bind connection to error event (to get notification of connection errors)
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+// use middleware
 app.use(logger("dev"));
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "./../public")));
 
+// router API
+app.use("/api/v1/email", emailRouter);
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
