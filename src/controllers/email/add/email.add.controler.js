@@ -5,7 +5,7 @@ function add(req, res, next) {
   const { domian, emailTo, emailFrom, message } = req.body;
   if (!domian || !emailTo || !emailFrom || !message) {
     res.status(400);
-    return res.send({
+    return res.json({
       err: "Missing minimum one element",
       domian: !!domian,
       emailTo: !!emailTo,
@@ -25,7 +25,7 @@ function add(req, res, next) {
         res.status(400);
         return res.json({ err: "Data format incorrect" });
       }
-      res.send({ message: "saved" });
+      res.json({ message: "saved" });
     }
   );
 }
