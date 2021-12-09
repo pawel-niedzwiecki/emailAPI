@@ -3,6 +3,6 @@ const router = express.Router();
 const controlerMail = require("./../controllers/email/email.controler");
 
 /* GET users listing. */
-router.post("/", controlerMail.add);
+router.put("/", controlerMail.add);
 
 module.exports = router;
